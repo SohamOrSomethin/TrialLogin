@@ -1,0 +1,81 @@
+<!-- success.html -->
+{% extends "base.html" %}
+
+{% block title %}Login Successful{% endblock title %}
+
+{% block body %}
+<style>
+  table {
+      width: 80%;
+      margin: 20px auto;
+      border-collapse: collapse;
+  }
+
+  th, td {
+      padding: 10px;
+      border: 1px solid #dddddd;
+      text-align: left;
+  }
+
+  th {
+      background-color: #f2f2f2;
+  }
+
+  tr:nth-child(even) {
+      background-color: #f9f9f9;
+  }
+
+  h2 {
+      text-align: center;
+  }
+
+  .container {
+      margin: 0 auto;
+      text-align: center;
+  }
+</style>
+<section class="h-100 gradient-form">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-xl-10">
+        <div class="card rounded-3 text-black">
+          <div class="row g-0">
+            <div class="col-lg-6">
+              <div class="card-body p-md-5 mx-md-4">
+                <div class="text-center">
+                  <h4 class="mt-1 mb-5 pb-1">Login Successful</h4>
+                </div>
+                <h3>Welcome, {{ first_name }} {{ last_name }}!</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Roll Number</th>
+                      <th>Batch</th>
+                      <th>Attendance</th>
+                      <th>CIE marks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{{roll_number}}</td>
+                      <td>{{batch}}</td>
+                      <td>{{attendance}} %</td>
+                      <td>{{cie_marks}}/20</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <a href="{% url 'index' %}" class="btn btn-primary">Go to Login</a>
+              </div>
+            </div>
+            <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
+              <div class="text-white px-3 py-4 p-md-5 mx-md-4">
+                <p class="small mb-0">You have successfully logged in. Enjoy your visit!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock body %}

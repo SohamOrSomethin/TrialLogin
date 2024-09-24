@@ -1,0 +1,13 @@
+{% extends "base.html" %} 
+
+{% block title %}Home{% endblock title %}
+
+{% block body %}
+<div class="container d-flex flex-column justify-content-center align-items-center min-vh-100">
+    <h1 class="text-center mb-4">Welcome to the Online NOC Portal</h1>
+    <div class="d-grid gap-3 col-md-8 col-lg-6">
+        <a href="{% url 'faculty' %}" class="btn btn-primary btn-lg fs-4 py-3" role="button">Faculty</a>
+        <a href="{% url 'student' %}" class="btn btn-primary btn-lg fs-4 py-3" role="button">Student</a>
+    </div>
+</div>
+{% endblock body %}
