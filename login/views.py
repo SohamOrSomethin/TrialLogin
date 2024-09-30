@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -16,17 +16,20 @@ def student_login(request):
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
-            # Check if user is a Student
             try:
                 student = Student.objects.get(registration_number=user.username)
+                subjects = student.subjects.all()
                 login(request, user)
                 context = {
+                    'prn_number': student.registration_number,
                     'first_name': student.first_name,
                     'last_name': student.last_name,
                     'attendance': student.attendance,
                     'cie_marks': student.cie_marks,
                     'batch': student.batch,
-                    'roll_number': student.roll_number
+                    'roll_number': student.roll_number,
+                    'subjects': subjects,
+                    'noc_signed':student.noc_signed,
                 }
                 return render(request, 'student_success.html', context)
             except Student.DoesNotExist:
@@ -56,7 +59,7 @@ def faculty_login(request):
                     'subjects': subjects_name,
                     'batches': batch_names,
                 }
-                return render(request, 'faculty_success.html', context)
+                return render(request, 'teacher_success.html', context)
             except Faculty.DoesNotExist:
                 messages.error(request, 'Invalid credentials or not a faculty account.')
         else:
@@ -71,13 +74,16 @@ def show_batch_data(request):
 
     faculty = Faculty.objects.get(email=user.username)
     print(f"Faculty Found: {faculty}")  
-
     batches = faculty.batches.all()
+    subjects = faculty.subjects.all()
     students = Student.objects.filter(batch__in=batches)
+    subjects_names = ', '.join([subject.subject_name for subject in subjects])
+    batch_names = ', '.join([batch.name for batch in batches])
         
     context = {
             'students': students,
-            'batches': batches
+            'batches': batch_names,
+            'subjects':subjects_names,
         }
     return render(request, 'show_batch_data.html', context)
 
@@ -131,6 +137,7 @@ def view_student(request, registration_number):
     subjects = student.subjects.all()
     attendance = student.attendance
     cie_marks = student.cie_marks
+    noc_signed = student.noc_signed
     
     #if request.method == 'POST':
         #student.signed_by_teacher = True
@@ -141,8 +148,20 @@ def view_student(request, registration_number):
         'student': student,
         'subjects': subjects,
         'attendance': attendance,
-        'cie_marks': cie_marks
+        'cie_marks': cie_marks,
+        'noc_signed': noc_signed,
     })    
+
+@login_required
+def toggle_noc_signed(request,registration_number):
+    student = get_object_or_404(Student,registration_number=registration_number)
+    if not student.noc_signed:
+        student.noc_signed = True
+        student.save()
+        messages.success(request,'NOC signed Successfully!')
+
+    return redirect('view_student', registration_number=registration_number)
+
 
 def student_success(request):
     return render(request, 'student_success.html')

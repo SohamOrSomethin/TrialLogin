@@ -11,5 +11,5 @@ urlpatterns = [
     path('show_batch_data/', views.show_batch_data, name='show_batch_data'),
     path('view_student/<str:registration_number>/', views.view_student, name='view_student'),
     path('add-student/', views.add_student, name='add_student'),
-    #path('student/<str:registration_number>/<str:batch_name>/', views.view_student, name='view_student'),
+    path('toggle_noc_signed/<int:registration_number>/',views.toggle_noc_signed,name='toggle_noc_signed'),
 ]

@@ -49,21 +49,43 @@
                 <table>
                   <thead>
                     <tr>
+                      <th>Registration number</th>
                       <th>Roll Number</th>
                       <th>Batch</th>
-                      <th>Attendance</th>
-                      <th>CIE marks</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
+                      <td>{{prn_number}}</td>
                       <td>{{roll_number}}</td>
                       <td>{{batch}}</td>
-                      <td>{{attendance}} %</td>
-                      <td>{{cie_marks}}/20</td>
                     </tr>
-                  </tbody>
-                </table>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Subjects</th>
+                          <th>Attendance</th>
+                          <th>SCE marks</th>
+                          <th>NOC status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for subject in subjects %}
+                        <tr>
+                          <td>{{ subject }}</td>
+                          <td>{{ attendance }} %</td>
+                          <td>{{cie_marks}}/20</td>
+                          <td>
+                            {% if noc_signed %}
+                                <span style="color: green;">Signed</span>
+                            {% else %}
+                                <span style="color: red;">Not Signed</span>
+                            {% endif %}
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
                 <a href="{% url 'index' %}" class="btn btn-primary">Go to Login</a>
               </div>
             </div>

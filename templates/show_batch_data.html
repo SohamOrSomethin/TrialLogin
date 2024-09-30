@@ -1,6 +1,6 @@
 {% extends "base.html" %} 
 
-{% block title %}{{batch}}{% endblock title %}
+{% block title %}Batch details{% endblock title %}
 {% block body %}
 <!DOCTYPE html>
 <html lang="en">
@@ -45,7 +45,8 @@
 </head>
 <body>
     <div class="container">
-        <h2>Batch: {{ batch }}</h2>
+        <h2>Subject: {{ subjects }}</h2>
+        <h2>Batch: {{ batches }}</h2>
         <table>
             <thead>
                 <tr>
@@ -77,5 +78,5 @@
     </div>
 </body>
 </html>
-<a href="{% url 'index' %}" class="btn btn-primary">Go to Login</a>
+<a href="{% url 'teacher_success' %}" class="btn btn-primary">Go back</a>
 {% endblock body %}

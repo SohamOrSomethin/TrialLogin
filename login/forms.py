@@ -15,5 +15,5 @@ class StudentForm(forms.ModelForm):
             'cie_marks': forms.NumberInput(attrs={'class': 'form-control'}),
             'batch': forms.Select(attrs={'class': 'form-control'}),
             'division': forms.Select(attrs={'class': 'form-control'}),
-            'subjects': forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'subjects': forms.CheckboxSelectMultiple(attrs={'class': 'form-control'}),
         }

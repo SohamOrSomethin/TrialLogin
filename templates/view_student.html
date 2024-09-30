@@ -22,6 +22,17 @@
                     <li>{{ subject.subject_name }}</li>
                 {% endfor %}
             </ul>
+            <p><strong>NOC Signed:</strong> 
+                {% if student.noc_signed %}
+                <span style="color: green;">Signed</span>
+                {% else %}
+                <span style="color: red;">Not Signed</span>
+                  <form action="{% url 'toggle_noc_signed' student.registration_number %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">Sign NOC</button>
+                  </form>
+                {% endif %}
+            </p>
         </div>
     </div>
 
