@@ -20,7 +20,15 @@ class Subject(models.Model):
 
     def __str__(self):
         return self.subject_name
-    
+
+class StudentSubject(models.Model):
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    noc_signed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.student} - {self.subject} (NOC Signed: {self.noc_signed})"
+   
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     registration_number = models.CharField(max_length=20, unique=True, primary_key=True)
@@ -32,7 +40,6 @@ class Student(models.Model):
     batch = models.ForeignKey(Batch, on_delete=models.SET_NULL, null=True, blank=True)
     division = models.ForeignKey(Division, on_delete=models.SET_NULL, null=True, blank=True)
     subjects = models.ManyToManyField(Subject, blank=True)
-    noc_signed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

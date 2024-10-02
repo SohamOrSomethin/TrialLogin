@@ -11,5 +11,5 @@ urlpatterns = [
     path('show_batch_data/', views.show_batch_data, name='show_batch_data'),
     path('view_student/<str:registration_number>/', views.view_student, name='view_student'),
     path('add-student/', views.add_student, name='add_student'),
-    path('toggle_noc_signed/<int:registration_number>/',views.toggle_noc_signed,name='toggle_noc_signed'),
+    path('sign_noc/<str:registration_number>/<str:subject_id>/', views.sign_noc_for_subject, name='sign_noc_for_subject'),
 ]

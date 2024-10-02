@@ -17,29 +17,34 @@
             <p><strong>Batch:</strong> {{ student.batch.name }}</p>
             <p><strong>Division:</strong> {{ student.division.name }}</p>
             <p><strong>Subjects:</strong></p>
-            <ul>
-                {% for subject in student.subjects.all %}
-                    <li>{{ subject.subject_name }}</li>
-                {% endfor %}
-            </ul>
-            <p><strong>NOC Signed:</strong> 
-                {% if student.noc_signed %}
-                <span style="color: green;">Signed</span>
-                {% else %}
-                <span style="color: red;">Not Signed</span>
-                  <form action="{% url 'toggle_noc_signed' student.registration_number %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success">Sign NOC</button>
-                  </form>
-                {% endif %}
-            </p>
         </div>
-    </div>
+
+      <table>
+    <tr>
+        <th>Subject</th>
+        <th>NOC Status</th>
+        <th>Action</th>
+    </tr>
+    {% for info in student_subjects_info %}
+    <tr>
+        <td>{{ info.subject.subject_name }}</td>
+        <td>{% if info.noc_signed %} <span style="color: green;">Signed</span> {% else %} <span style="color: red;">Not Signed</span> {% endif %}</td>
+        <td>
+            {% if info.is_teacher_assigned %}
+                <form method="POST" action="{% url 'sign_noc_for_subject' student.registration_number info.subject.subject_id %}">
+                    {% csrf_token %}
+                    <button type="submit">Sign NOC</button>
+                </form>
+            {% else %}
+                Only the assigned teacher can sign.
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
 
     <div class="text-center mt-4">
         <a href="{% url 'show_batch_data' %}" class="btn btn-info">View Batch</a>
-
-        
     </div>
-</div>
+
 {% endblock body %}

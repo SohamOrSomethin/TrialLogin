@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from login.models import Student, Faculty, Batch, Subject
+from login.models import Student, Faculty, Batch, Subject,StudentSubject
 from .forms import StudentForm
 
 def index(request):
@@ -19,6 +19,13 @@ def student_login(request):
             try:
                 student = Student.objects.get(registration_number=user.username)
                 subjects = student.subjects.all()
+                student_subjects = StudentSubject.objects.filter(student=student)
+                student_subjects_info = []
+                for student_subject in student_subjects:
+                    student_subjects_info.append({
+                    'subject': student_subject.subject,
+                    'noc_signed': student_subject.noc_signed,
+                    })
                 login(request, user)
                 context = {
                     'prn_number': student.registration_number,
@@ -29,7 +36,8 @@ def student_login(request):
                     'batch': student.batch,
                     'roll_number': student.roll_number,
                     'subjects': subjects,
-                    'noc_signed':student.noc_signed,
+                    'student_subjects': student_subjects,
+                    'student_subjects_info': student_subjects_info,
                 }
                 return render(request, 'student_success.html', context)
             except Student.DoesNotExist:
@@ -134,37 +142,44 @@ def add_student(request):
 @login_required
 def view_student(request, registration_number):
     student = Student.objects.get(registration_number=registration_number)
-    subjects = student.subjects.all()
-    attendance = student.attendance
-    cie_marks = student.cie_marks
-    noc_signed = student.noc_signed
-    
-    #if request.method == 'POST':
-        #student.signed_by_teacher = True
-        #student.save()
-        #return redirect('teacher_success')  
-    
+    student_subjects = StudentSubject.objects.filter(student=student)
+    teacher_subjects = request.user.faculty.subjects.all() 
+
+    # Create a list of subjects with a flag indicating if the teacher is assigned
+    student_subjects_info = []
+    for student_subject in student_subjects:
+        is_teacher_assigned = teacher_subjects.filter(subject_id=student_subject.subject.subject_id).exists()
+        student_subjects_info.append({
+            'subject': student_subject.subject,
+            'noc_signed': student_subject.noc_signed,
+            'is_teacher_assigned': is_teacher_assigned
+        })
+
     return render(request, 'view_student.html', {
         'student': student,
-        'subjects': subjects,
-        'attendance': attendance,
-        'cie_marks': cie_marks,
-        'noc_signed': noc_signed,
-    })    
+        'student_subjects_info': student_subjects_info,
+    })
+
 
 @login_required
-def toggle_noc_signed(request,registration_number):
-    student = get_object_or_404(Student,registration_number=registration_number)
-    if not student.noc_signed:
-        student.noc_signed = True
-        student.save()
-        messages.success(request,'NOC signed Successfully!')
+def sign_noc_for_subject(request, registration_number, subject_id):
+    student = Student.objects.get(registration_number=registration_number)
+    subject = Subject.objects.get(subject_id=subject_id)
+    
+    if request.user.faculty.subjects.filter(subject_id=subject.subject_id).exists():
+        student_subject = StudentSubject.objects.get(student=student, subject=subject)
+        student_subject.noc_signed = True
+        student_subject.save()
+        messages.success(request, "NOC signed successfully!")
+    else:
+        messages.error(request, "You are not authorized to sign this NOC.")
 
     return redirect('view_student', registration_number=registration_number)
 
 
 def student_success(request):
     return render(request, 'student_success.html')
+
 
 def teacher_success(request):
     return render(request, 'teacher_success.html')
