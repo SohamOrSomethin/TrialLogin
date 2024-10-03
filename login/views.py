@@ -21,17 +21,28 @@ def student_login(request):
                 subjects = student.subjects.all()
                 student_subjects = StudentSubject.objects.filter(student=student)
                 student_subjects_info = []
+                attendance_total=0
+                attendance_lab_total=0
                 for student_subject in student_subjects:
+                    attendance_total = attendance_total + student_subject.subject_attendance
+                    attendance_lab_total = attendance_lab_total + student_subject.subject_lab_attendance 
                     student_subjects_info.append({
                     'subject': student_subject.subject,
                     'noc_signed': student_subject.noc_signed,
+                    'subject_attendance':student_subject.subject_attendance,
+                    'subject_lab_attendance':student_subject.subject_lab_attendance,
+                    'assignments_submitted':student_subject.assignments_submitted,
                     })
                 login(request, user)
+                avg_att =int(attendance_total/7)
+                avg_lab_att= int(attendance_lab_total/7)
                 context = {
                     'prn_number': student.registration_number,
                     'first_name': student.first_name,
                     'last_name': student.last_name,
-                    'attendance': student.attendance,
+                    'avg_att':avg_att,
+                    'avg_lab_att':avg_lab_att,
+                    #'attendance': student.attendance,
                     'cie_marks': student.cie_marks,
                     'batch': student.batch,
                     'roll_number': student.roll_number,
@@ -87,7 +98,7 @@ def show_batch_data(request):
     students = Student.objects.filter(batch__in=batches)
     subjects_names = ', '.join([subject.subject_name for subject in subjects])
     batch_names = ', '.join([batch.name for batch in batches])
-        
+         
     context = {
             'students': students,
             'batches': batch_names,
@@ -147,16 +158,27 @@ def view_student(request, registration_number):
 
     # Create a list of subjects with a flag indicating if the teacher is assigned
     student_subjects_info = []
+    attendance_total=0
+    attendance_lab_total=0
     for student_subject in student_subjects:
+        attendance_total = attendance_total + student_subject.subject_attendance
+        attendance_lab_total = attendance_lab_total + student_subject.subject_lab_attendance
         is_teacher_assigned = teacher_subjects.filter(subject_id=student_subject.subject.subject_id).exists()
         student_subjects_info.append({
+            'subject_attendance':student_subject.subject_attendance,
+            'subject_lab_attendance':student_subject.subject_lab_attendance,
+            'assignments_submitted':student_subject.assignments_submitted,
             'subject': student_subject.subject,
             'noc_signed': student_subject.noc_signed,
             'is_teacher_assigned': is_teacher_assigned
         })
+        avg_att =int(attendance_total/7)
+        avg_lab_att= int(attendance_lab_total/7)
 
     return render(request, 'view_student.html', {
         'student': student,
+        'avg_att':avg_att,
+        'avg_lab_att':avg_lab_att,
         'student_subjects_info': student_subjects_info,
     })
 
@@ -173,6 +195,20 @@ def sign_noc_for_subject(request, registration_number, subject_id):
         messages.success(request, "NOC signed successfully!")
     else:
         messages.error(request, "You are not authorized to sign this NOC.")
+
+    return redirect('view_student', registration_number=registration_number)
+
+@login_required
+def assignments_status(request, registration_number, subject_id):
+    student = Student.objects.get(registration_number=registration_number)
+    subject = Subject.objects.get(subject_id=subject_id)
+
+    
+    if request.user.faculty.subjects.filter(subject_id=subject.subject_id).exists():
+        student_subject = StudentSubject.objects.get(student=student, subject=subject)
+        student_subject.assignments_submitted = True
+        student_subject.save()
+        messages.success(request, "Assignments Collected")
 
     return redirect('view_student', registration_number=registration_number)
 

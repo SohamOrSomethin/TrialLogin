@@ -29,7 +29,6 @@
   h2 {
     text-align: center;
   }
-
   .container {
     margin: 0 auto;
     text-align: center;
@@ -53,7 +52,8 @@
                       <th>Registration Number</th>
                       <th>Roll Number</th>
                       <th>Batch</th>
-                      <th>Attendance</th>
+                      <th>Average Attendance</th>
+                      <th>Average Lab Attendance</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -61,7 +61,8 @@
                       <td>{{ prn_number }}</td>
                       <td>{{ roll_number }}</td>
                       <td>{{ batch }}</td>
-                      <td>{{ attendance }} %</td>
+                      <td>{{ avg_att }} %</td>
+                      <td>{{ avg_lab_att}} %</td>
                     </tr>
                   </tbody>
                 </table>
@@ -69,6 +70,9 @@
                   <thead>
                     <tr>
                       <th>Subject</th>
+                      <th>Subject Attendance</th>
+                      <th>Subject Lab Attendance</th>
+                      <th>Assignment status</th>
                       <th>NOC Status</th>
                     </tr>
                   </thead>
@@ -76,6 +80,10 @@
                     {% for info in student_subjects_info %}
                     <tr>
                       <td>{{ info.subject.subject_name }}</td>
+                      <td>{{ info.subject_attendance }} %</td>
+                      <td>{{ info.subject_lab_attendance }} %</td>
+                      <td class="status {% if info.assignments_submitted %} submitted {% else %} not-submitted {% endif %}">
+                        {% if info.assignments_submitted %} <span style="color: green;">Submitted</span> {% else %} <span style="color: red;">Not Submitted</span> {% endif %}
                       <td>
                         {% if info.noc_signed %}
                           <span style="color: green;">Signed</span>

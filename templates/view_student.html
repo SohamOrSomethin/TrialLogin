@@ -12,36 +12,101 @@
         <div class="card-body">
             <p><strong>Registration Number:</strong> {{ student.registration_number }}</p>
             <p><strong>Roll Number:</strong> {{ student.roll_number }}</p>
-            <p><strong>Attendance:</strong> {{ student.attendance }}%</p>
+            <p><strong>Average Attendance:</strong> {{ avg_att }}%</p>
+            <p><strong>Average Lab Attendance:</strong> {{ avg_lab_att }}%</p>
             <p><strong>CIE Marks:</strong> {{ student.cie_marks }}/20</p>
             <p><strong>Batch:</strong> {{ student.batch.name }}</p>
             <p><strong>Division:</strong> {{ student.division.name }}</p>
-            <p><strong>Subjects:</strong></p>
         </div>
 
-      <table>
-    <tr>
-        <th>Subject</th>
-        <th>NOC Status</th>
-        <th>Action</th>
-    </tr>
-    {% for info in student_subjects_info %}
-    <tr>
-        <td>{{ info.subject.subject_name }}</td>
-        <td>{% if info.noc_signed %} <span style="color: green;">Signed</span> {% else %} <span style="color: red;">Not Signed</span> {% endif %}</td>
-        <td>
-            {% if info.is_teacher_assigned %}
-                <form method="POST" action="{% url 'sign_noc_for_subject' student.registration_number info.subject.subject_id %}">
-                    {% csrf_token %}
-                    <button type="submit">Sign NOC</button>
-                </form>
-            {% else %}
-                Only the assigned teacher can sign.
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                font-size: 1.1em;
+                text-align: left;
+            }
+            th, td {
+                padding: 12px 15px;
+                border: 1px solid #ddd;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            tr:hover {
+                background-color: #f1f1f1;
+            }
+            .status {
+                font-weight: bold;
+            }
+            .submitted {
+                color: green;
+            }
+            .not-submitted {
+                color: red;
+            }
+            .signed {
+                color: green;
+            }
+            .not-signed {
+                color: red;
+            }
+            button {
+                padding: 6px 12px;
+                border: none;
+                background-color: #007BFF;
+                color: white;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            button:hover {
+                background-color: #0056b3;
+            }
+        </style>
+    
+    <table>
+        <tr>
+            <th>Subject</th>
+            <th>Subject Attendance</th>
+            <th>Subject Lab Attendance</th>
+            <th>Assignments Status</th>
+            <th>NOC Status</th>
+            <th>Action</th>
+        </tr>
+        {% for info in student_subjects_info %}
+        <tr>
+            <td>{{ info.subject.subject_name }}</td>
+            <td>{{ info.subject_attendance }} %</td>
+            <td>{{ info.subject_lab_attendance }} %</td>
+            <td class="status {% if info.assignments_submitted %} submitted {% else %} not-submitted {% endif %}">
+                {% if info.assignments_submitted %} Submitted {% else %} Not Submitted {% endif %}
+                {% if info.is_teacher_assigned %}
+                    <form method="POST" action="{% url 'assignments_status' student.registration_number info.subject.subject_id %}">
+                        {% csrf_token %}
+                        <button type="submit">Collected</button>
+                    </form>
+                    {% endif %}
+            </td>
+            <td class="status {% if info.noc_signed %} signed {% else %} not-signed {% endif %}">
+                {% if info.noc_signed %} Signed {% else %} Not Signed {% endif %}
+            </td>
+            <td>
+                {% if info.is_teacher_assigned %}
+                    <form method="POST" action="{% url 'sign_noc_for_subject' student.registration_number info.subject.subject_id %}">
+                        {% csrf_token %}
+                        <button type="submit">Sign NOC</button>
+                    </form>
+                {% else %}
+                    Only the assigned teacher can sign.
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 
     <div class="text-center mt-4">
         <a href="{% url 'show_batch_data' %}" class="btn btn-info">View Batch</a>

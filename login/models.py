@@ -23,11 +23,18 @@ class Subject(models.Model):
 
 class StudentSubject(models.Model):
     student = models.ForeignKey('Student', on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    subject = models.ForeignKey('Subject', on_delete=models.CASCADE)
+    assignments_submitted = models.BooleanField(default=False)
     noc_signed = models.BooleanField(default=False)
+    subject_attendance = models.IntegerField()
+    subject_lab_attendance = models.IntegerField()
 
     def __str__(self):
-        return f"{self.student} - {self.subject} (NOC Signed: {self.noc_signed})"
+        return (f"{self.student} - {self.subject} "
+                f"(NOC Signed: {self.noc_signed}) "
+                f"(Assignments Submitted: {self.assignments_submitted}) "
+                f"subject_attendance: {self.subject_attendance} "
+                f"subject_lab_attendance: {self.subject_lab_attendance}")
    
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
